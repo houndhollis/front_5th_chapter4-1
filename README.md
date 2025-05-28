@@ -3,6 +3,39 @@
 
 ## 1️⃣ 기본과제
 
+### 주요 링크
+
+- S3 버킷 웹사이트 엔드포인트: _________
+- CloudFrount 배포 도메인 이름: _________
+
+### 주요 개념
+
+- ### GitHub Actions과 CI/CD 도구 <br/> 
+자동으로 코드를 빌드하고 배포해주는 도구입니다. **GitHub Actions**는 GitHub에 내장된 CI/CD(Continuous Integration / Continuous Deployment) 플랫폼입니다. <br/><br/>
+예: main 브랜치에 push → 빌드 → S3에 업로드 → CloudFront 캐시 무효화까지 자동 실행 <br/>
+CI는 테스트/빌드 자동화, CD는 배포 자동화
+
+- ### S3와 스토리지 <br/>
+정적 웹사이트 파일(html, js, css 등)을 저장하는 AWS 서비스입니다.<br/>
+Next.js 빌드 결과물 (out/) 폴더의 내용을 올리는 공간으로 일반적인 웹 호스팅 서버처럼 HTML/CSS/JS 정적 파일 제공합니다. CloudFront와 함께 쓰면 훨씬 빠르고 안전하게 배포 가능합니다. 
+- ### CloudFront와 CDN <br/>
+사용자에게 가장 가까운 위치에서 빠르게 콘텐츠를 제공하는 CDN (Content Delivery Network)입니다.
+S3에서 직접 가져오는 것보다 빠르고 안정적으로 서비스 가능하며 전 세계 엣지 로케이션에 캐시되어 응답 속도를 향상시킵니다.
+
+커스텀 도메인 연결, HTTPS 제공, 캐시 설정 등 가능
+- ### 캐시 무효화(Cache Invalidation) <br/>
+CloudFront에 남아 있는 옛날 파일을 강제로 새 파일로 바꿔주는 명령어입니다. <br/>
+
+예: 빌드된 JS/CSS 파일은 이름이 같아서 바뀌어도 CloudFront가 예전 파일을 계속 줄 수 있습니다. <br/>
+-> 캐시 무효화 필요 !
+🧠 자세한 내용은 아래에 있습니다.
+
+- ### Repository secret과 환경변수 <br/>
+보안이 필요한 민감한 값을 GitHub에 안전하게 저장하는 방법입니다. <br/>
+
+예: AWS_ACCESS_KEY_ID, S3_BUCKET_NAME, CLOUDFRONT_DISTRIBUTION_ID 등... <br/>
+GitHub Secrets에 저장하고, GitHub Actions에서 ${{ secrets.XXX }} 로 사용되며, 직접 코드에 노출되면 보안상 매우 위험합니다.
+
 ### 배포 파이브라인 시각화
 <img width="1142" alt="스크린샷 2025-05-28 오후 8 00 26" src="https://github.com/user-attachments/assets/a36eb312-6397-4835-93e8-899885df5746" />
 1. 개발자 → GitHub (push)<br/>
@@ -14,7 +47,7 @@
 ### 캐시 무효화
 deployment.yml 에서 ```aws cloudfront create-invalidation``` 부분이 바로 **캐시 무효화(invalidation)** 단계입니다.
 - CloudFront는 성능 향상을 위해 정적 콘텐츠를 전 세계 엣지 로케이션에 캐싱합니다.
-- 코드가 변경되어도 캐시가 남아 있으면 구버전이 사용자에게 제공될 수 있어요.
+- 코드가 변경되어도 캐시가 남아 있으면 구버전이 사용자에게 제공될 수 있습니다.
 - 따라서 배포 후 "/*" 경로를 무효화해서, 최신 콘텐츠를 엣지에서 다시 받아오도록 강제 합니다.
 <br/>
 
@@ -66,3 +99,17 @@ CloudFront는 기본적으로 콘텐츠를 1일 동안 캐시합니다. 요청 �
 - 설정 위치 :	CloudFront Behavior 또는 원본의 Cache-Control
 - 무효화와 차이 : TTL은 자동 만료, 무효화는 강제 삭제
 - 전략	자주 바뀌는 콘텐츠는 짧은 TTL, 안 바뀌는 건 긴 TTL
+
+### Route53 
+AWS의 DNS 서비스로, 도메인 이름을 웹 서버, S3 버킷, CloudFront 배포 등과 연결할 수 있게 해주는 서비스입니다.
+```
+사용자 브라우저
+      ↓
+www.domain.com (도메인 입력)
+      ↓
+Route 53 (DNS 해석)
+      ↓
+CloudFront (글로벌 CDN)
+      ↓
+S3 (정적 파일 서비스)
+```
