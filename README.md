@@ -113,3 +113,11 @@ CloudFront (글로벌 CDN)
       ↓
 S3 (정적 파일 서비스)
 ```
+## 2️⃣ 심화과제
+| CDN 도입전 | CDN 도입후 |
+|----------|-----------|
+| <img width="780" alt="스크린샷 2025-05-28 오후 9 08 50" src="https://github.com/user-attachments/assets/e0fdeb80-bc92-4355-b2da-3a463ef45634" /> | <img width="780" alt="스크린샷 2025-05-28 오후 9 09 07" src="https://github.com/user-attachments/assets/08b45c17-9bfe-44ed-84c1-852b765ecdc5" /> |
+### 성능
+CDN 적용 후, 네트워크 요청 수와 리소스 로딩 시간이 현저히 감소한 것을 확인할 수 있습니다. 이는 정적 리소스가 S3가 아닌 CloudFront 엣지 서버에서 캐싱되어 빠르게 전달되기 때문입니다.
+
+ 
