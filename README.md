@@ -5,8 +5,8 @@
 
 ### 주요 링크
 
-- S3 버킷 웹사이트 엔드포인트: _________
-- CloudFrount 배포 도메인 이름: _________
+- S3 버킷 웹사이트 엔드포인트: http://kywbucket1.s3-website.ap-northeast-2.amazonaws.com
+- CloudFrount 배포 도메인 이름: https://d29keg2xwnzrdd.cloudfront.net
 
 ### 주요 개념
 
@@ -119,5 +119,27 @@ S3 (정적 파일 서비스)
 | <img width="780" alt="스크린샷 2025-05-28 오후 9 08 50" src="https://github.com/user-attachments/assets/e0fdeb80-bc92-4355-b2da-3a463ef45634" /> | <img width="780" alt="스크린샷 2025-05-28 오후 9 09 07" src="https://github.com/user-attachments/assets/08b45c17-9bfe-44ed-84c1-852b765ecdc5" /> |
 ### 성능
 CDN 적용 후, 네트워크 요청 수와 리소스 로딩 시간이 현저히 감소한 것을 확인할 수 있습니다. 이는 정적 리소스가 S3가 아닌 CloudFront 엣지 서버에서 캐싱되어 빠르게 전달되기 때문입니다.
+
+### 📌 AS-IS: S3 버킷 단독 정적 파일 제공
+- 정적 파일을 S3 버킷에서 직접 제공
+- 단일 리전(예: 서울 리전)에서 파일 응답 처리
+- 대한민국에서 거리가 먼 지역(예: 해외 사용자)에서 높은 레이턴시(Latency) 경험
+- 브라우저 네트워크 탭에서:
+  -  TTFB(Time to First Byte) 값이 상대적으로 높음
+  -  병렬 요청 처리 한계 및 일정량의 지연 발생
+
+### 📌 TO-BE: CloudFront CDN을 이용한 정적 파일 캐싱 및 배포
+- AWS CloudFront를 사용하여 정적 리소스를 전 세계 엣지 서버에 캐싱
+- 사용자 요청 시 가까운 엣지 로케이션에서 빠르게 응답
+- S3는 CloudFront의 오리진(Origin) 역할만 수행
+- 브라우저 네트워크 탭에서:
+  - TTFB 및 콘텐츠 다운로드 시간 급감
+  - 캐시 히트 시, 응답 시간이 수 밀리초(ms) 단위로 짧아짐
+
+### ✅ Result
+- 평균 TTFB 300~800ms -> 50~150ms
+- 전체 페이지 로딩 시간 약 2.5~4초 -> 약 0.8~1.5초
+- 평균 감소율 약 60~80% 감소
+
 
  
